@@ -21,7 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.antlr.v4.runtime.RuntimeMetaData;
-import org.hibernate.grammars.hql.HqlParser;
+import org.hibernate.hql.internal.ast.HqlParser;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.asm.ClassReader;
 import org.springframework.asm.ClassVisitor;
@@ -42,6 +43,7 @@ class AntlrVersionTests {
 
 	@Test
 	@DisabledOnHibernate62
+	@Disabled("Doesn't work with Hibernate 5.x")
 	void antlrVersionConvergence() throws Exception {
 
 		ClassReader reader = new ClassReader(HqlParser.class.getName());

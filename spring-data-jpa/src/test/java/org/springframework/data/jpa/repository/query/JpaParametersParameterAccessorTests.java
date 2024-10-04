@@ -9,7 +9,8 @@ import jakarta.persistence.Query;
 
 import java.lang.reflect.Method;
 
-import org.hibernate.query.TypedParameterValue;
+import org.hibernate.jpa.TypedParameterValue;
+import org.hibernate.type.StandardBasicTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,10 +61,10 @@ class JpaParametersParameterAccessorTests {
 
 		bind(parameters, accessor);
 
-		ArgumentCaptor<TypedParameterValue<?>> captor = ArgumentCaptor.forClass(TypedParameterValue.class);
+		ArgumentCaptor<TypedParameterValue> captor = ArgumentCaptor.forClass(TypedParameterValue.class);
 		verify(query).setParameter(eq(1), captor.capture());
-		TypedParameterValue<?> captorValue = captor.getValue();
-		assertThat(captorValue.getType().getBindableJavaType()).isEqualTo(Integer.class);
+		TypedParameterValue captorValue = captor.getValue();
+		assertThat(captorValue.getType()).isEqualTo(StandardBasicTypes.INTEGER);
 		assertThat(captorValue.getValue()).isNull();
 	}
 

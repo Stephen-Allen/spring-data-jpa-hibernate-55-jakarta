@@ -478,8 +478,9 @@ public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T
 		CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
 		CriteriaDelete<T> delete = builder.createCriteriaDelete(getDomainClass());
 
+		final Root<T> root = delete.from(getDomainClass());
 		if (spec != null) {
-			Predicate predicate = spec.toPredicate(delete.from(getDomainClass()), builder.createQuery(getDomainClass()),
+			Predicate predicate = spec.toPredicate(root, builder.createQuery(getDomainClass()),
 					builder);
 
 			if (predicate != null) {

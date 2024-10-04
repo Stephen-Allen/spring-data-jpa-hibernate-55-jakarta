@@ -16,7 +16,6 @@
 package org.springframework.data.jpa.provider;
 
 import org.hibernate.query.Query;
-import org.hibernate.query.spi.SqmQuery;
 import org.springframework.lang.Nullable;
 
 /**
@@ -26,8 +25,6 @@ import org.springframework.lang.Nullable;
  * @author Oliver Gierke
  * @author Mark Paluch
  * @author Jens Schauder
- * @author Donghun Shin
- * @author Greg Turnquist
  * @since 1.10.2
  * @soundtrack Benny Greb - Soulfood (Live, https://www.youtube.com/watch?v=9_ErMa_CtSw)
  */
@@ -44,26 +41,8 @@ public abstract class HibernateUtils {
 	@Nullable
 	public static String getHibernateQuery(Object query) {
 
-		try {
-
-			// Try the new Hibernate implementation first
-			if (query instanceof SqmQuery sqmQuery) {
-
-				String hql = sqmQuery.getQueryString();
-
-				if (!hql.equals("<criteria>")) {
-					return hql;
-				}
-
-				return sqmQuery.getSqmStatement().toHqlString();
-			}
-
-			// Couple of cases in which this still breaks, see HHH-15389
-		} catch (RuntimeException o_O) {}
-
-		// Try the old way, as it still works in some cases (haven't investigated in which exactly)
-		if (query instanceof Query<?> hibernateQuery) {
-			return hibernateQuery.getQueryString();
+		if (query instanceof Query) {
+			return ((Query) query).getQueryString();
 		} else {
 			throw new IllegalArgumentException("Don't know how to extract the query string from " + query);
 		}

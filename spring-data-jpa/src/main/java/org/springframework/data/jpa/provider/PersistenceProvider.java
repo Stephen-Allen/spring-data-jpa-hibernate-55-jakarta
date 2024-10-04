@@ -189,7 +189,7 @@ public enum PersistenceProvider implements QueryExtractor, ProxyIdAccessor, Quer
 
 		Class<?> type;
 		try {
-			type = ClassUtils.forName("org.hibernate.query.TypedParameterValue", PersistenceProvider.class.getClassLoader());
+			type = ClassUtils.forName("org.hibernate.jpa.TypedParameterValue", PersistenceProvider.class.getClassLoader());
 		} catch (ClassNotFoundException e) {
 			type = null;
 		}
@@ -357,9 +357,9 @@ public enum PersistenceProvider implements QueryExtractor, ProxyIdAccessor, Quer
 		String GENERIC_JPA_ENTITY_MANAGER_INTERFACE = "jakarta.persistence.EntityManager";
 		String ECLIPSELINK_ENTITY_MANAGER_INTERFACE = "org.eclipse.persistence.jpa.JpaEntityManager";
 		// needed as Spring only exposes that interface via the EM proxy
-		String HIBERNATE_ENTITY_MANAGER_INTERFACE = "org.hibernate.engine.spi.SessionImplementor";
+		String HIBERNATE_ENTITY_MANAGER_INTERFACE = "org.hibernate.jpa.HibernateEntityManager";
 
-		String HIBERNATE_JPA_METAMODEL_TYPE = "org.hibernate.metamodel.model.domain.JpaMetamodel";
+		String HIBERNATE_JPA_METAMODEL_TYPE = "org.hibernate.metamodel.internal.MetamodelImpl";
 		String ECLIPSELINK_JPA_METAMODEL_TYPE = "org.eclipse.persistence.internal.jpa.metamodel.MetamodelImpl";
 	}
 
@@ -377,7 +377,7 @@ public enum PersistenceProvider implements QueryExtractor, ProxyIdAccessor, Quer
 	 */
 	private static class HibernateScrollableResultsIterator implements CloseableIterator<Object> {
 
-		private final @Nullable ScrollableResults<Object[]> scrollableResults;
+		private final @Nullable ScrollableResults scrollableResults;
 
 		/**
 		 * Creates a new {@link HibernateScrollableResultsIterator} for the given {@link Query}.
@@ -386,7 +386,7 @@ public enum PersistenceProvider implements QueryExtractor, ProxyIdAccessor, Quer
 		 */
 		HibernateScrollableResultsIterator(Query jpaQuery) {
 
-			org.hibernate.query.Query<Object[]> query = jpaQuery.unwrap(org.hibernate.query.Query.class);
+			org.hibernate.query.Query<?> query = jpaQuery.unwrap(org.hibernate.query.Query.class);
 			this.scrollableResults = query.setReadOnly(TransactionSynchronizationManager.isCurrentTransactionReadOnly())//
 					.scroll(ScrollMode.FORWARD_ONLY);
 		}

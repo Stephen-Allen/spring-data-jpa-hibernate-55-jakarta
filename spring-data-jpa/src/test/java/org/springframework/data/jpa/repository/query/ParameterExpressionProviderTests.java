@@ -24,6 +24,7 @@ import jakarta.persistence.criteria.ParameterExpression;
 
 import java.lang.reflect.Method;
 
+import org.hibernate.type.StandardBasicTypes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.data.jpa.domain.sample.User;
@@ -60,7 +61,7 @@ class ParameterExpressionProviderTests {
 		ParameterMetadataProvider provider = new ParameterMetadataProvider(builder, accessor, EscapeCharacter.DEFAULT);
 		ParameterExpression<? extends Comparable> expression = provider.next(part, Comparable.class).getExpression();
 
-		assertThat(expression.getParameterType()).isEqualTo(Integer.class);
+		assertThat(expression.getParameterType()).isEqualTo(int.class);
 	}
 
 	interface SampleRepository {

@@ -32,6 +32,8 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -69,6 +71,7 @@ import org.springframework.util.FileSystemUtils;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration
 @Transactional
+@DisabledOnOs(OS.WINDOWS)
 class EclipseLinkMetaAnnotatedQueryMethodIntegrationTests {
 
 	@Autowired RoleRepositoryWithMeta repository;

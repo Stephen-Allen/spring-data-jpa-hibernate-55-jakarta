@@ -16,11 +16,10 @@
 package org.springframework.data.jpa.repository.query;
 
 import jakarta.persistence.EntityManager;
-
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.query.TypedParameterValue;
-import org.hibernate.type.BasicType;
-import org.hibernate.type.BasicTypeRegistry;
+import org.hibernate.SessionFactory;
+import org.hibernate.TypeHelper;
+import org.hibernate.jpa.TypedParameterValue;
+import org.hibernate.type.Type;
 import org.springframework.data.repository.query.Parameter;
 import org.springframework.data.repository.query.Parameters;
 import org.springframework.data.repository.query.ParametersParameterAccessor;
@@ -28,21 +27,17 @@ import org.springframework.lang.Nullable;
 
 /**
  * {@link org.springframework.data.repository.query.ParameterAccessor} based on an {@link Parameters} instance. In
- * addition to the {@link JpaParametersParameterAccessor} functions, the bindable parameterValue is provided by fetching
- * the method type when there is null.
+ * addition to the {@link JpaParametersParameterAccessor} functions, the bindable value is provided by fetching the
+ * method type when there is null.
  *
  * @author Wonchul Heo
  * @author Jens Schauder
  * @author Cedomir Igaly
- * @author Robert Wilson
- * @author Oliver Drotbohm
- * @author Greg Turnquist
- * @author Julia Lee
  * @since 2.7
  */
 class HibernateJpaParametersParameterAccessor extends JpaParametersParameterAccessor {
 
-	private final BasicTypeRegistry typeHelper;
+	private final TypeHelper typeHelper;
 
 	/**
 	 * Creates a new {@link ParametersParameterAccessor}.
@@ -55,45 +50,38 @@ class HibernateJpaParametersParameterAccessor extends JpaParametersParameterAcce
 
 		super(parameters, values);
 
-		this.typeHelper = em.getEntityManagerFactory() //
-				.unwrap(SessionFactoryImplementor.class) //
-				.getTypeConfiguration() //
-				.getBasicTypeRegistry();
+		this.typeHelper = em.getEntityManagerFactory().unwrap(SessionFactory.class).getTypeHelper();
 	}
 
 	@Override
-	@Nullable
-	@SuppressWarnings("unchecked")
 	public Object getValue(Parameter parameter) {
 
 		Object value = super.getValue(parameter.getIndex());
-
 		if (value != null) {
 			return value;
 		}
 
-		BasicType<?> type = typeHelper.getRegisteredType(parameter.getType());
-
+		Type type = typeHelper.basic(parameter.getType());
 		if (type == null) {
 			return null;
 		}
-
-		return new TypedParameterValue<>(type, null);
+		return new TypedParameterValue(type, null);
 	}
 
 	/**
-	 * For Hibernate, check if the incoming parameterValue can be wrapped inside a {@link TypedParameterValue} before
-	 * extracting.
+	 * Utility method to potentially unwrap {@link TypedParameterValue}s. For certain operations, Hibernate doesn't
+	 * properly support them, so we must unwrap them before passing through.
 	 *
-	 * @param parameterValue a parameterValue that is either a plain value or a {@link TypedParameterValue} containing a
-	 *          {@literal Date}.
-	 * @since 3.0.4
+	 * @param extractedValue the unwrapped value of the original value if there is nothing to unwrap.
+	 * @return the value behind a {@link TypedParameterValue}
 	 */
 	@Override
-	protected Object potentiallyUnwrap(Object parameterValue) {
+	public Object potentiallyUnwrap(Object extractedValue) {
 
-		return (parameterValue instanceof TypedParameterValue<?> typedParameterValue) //
-				? typedParameterValue.getValue() //
-				: parameterValue;
+		if (extractedValue instanceof TypedParameterValue) {
+			return ((TypedParameterValue) extractedValue).getValue();
+		} else {
+			return extractedValue;
+		}
 	}
 }
