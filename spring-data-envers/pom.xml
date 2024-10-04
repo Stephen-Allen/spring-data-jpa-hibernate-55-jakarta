@@ -53,8 +53,8 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-jpa-hibernate-55</artifactId>
+			<groupId>io.github.stephen-allen</groupId>
+			<artifactId>spring-data-jpa-hibernate-55-jakarta</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
